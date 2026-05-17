@@ -1,0 +1,208 @@
+\documentclass[runningheads]{llncs}
+%
+\usepackage{listings}
+\usepackage{amssymb}
+\usepackage{amsmath}
+\usepackage{pifont}
+\usepackage{cite}
+\usepackage[T1]{fontenc}
+\usepackage{microtype}
+\usepackage{ifthen}
+\usepackage{graphicx}
+% Removed unused packages to speed up compilation
+\usepackage{comment}
+%\usepackage{geometry}
+\usepackage[ruled,linesnumbered, noend]{algorithm2e}
+%\usepackage{algpseudocode}
+\usepackage{siunitx}
+\usepackage{placeins} % for \FloatBarrier
+\renewcommand{\dblfloatpagefraction}{0.9}
+\renewcommand{\dbltopfraction}{0.9}
+\renewcommand{\floatpagefraction}{0.85}
+% \usepackage[noline,boxed,ruled,noend,linesnumbered]{algorithm2e}
+% \usepackage{wrapfig}
+% \usepackage{vcell}
+% \usepackage{appendix}
+\usepackage[dvipsnames]{xcolor}
+\usepackage{listings-rust}
+\usepackage{lstlinebgrd}
+\usepackage{lmodern}
+\usepackage{booktabs}
+\usepackage{makecell}
+\usepackage{tikz}
+\usepackage{placeins}
+% consolidated to single \usetikzlibrary below
+
+\newcommand{\cmark}{\ding{51}}%
+\newcommand{\xmark}{\ding{55}}%
+\usepackage[hidelinks]{hyperref}
+\hypersetup{
+    colorlinks=true,
+    linkcolor=RedViolet,
+    anchorcolor=black,
+    citecolor=blue,
+    urlcolor=black,
+    breaklinks=true
+}
+\usepackage{orcidlink}
+
+\usepackage[capitalise]{cleveref}
+\Crefname{equation}{}{}
+\Crefname{appendix}{Appx.}{Appxs.}
+\Crefname{section}{Sect.}{Sects.}
+\Crefname{figure}{Fig.}{Figs.}
+
+\usepackage{enumitem}
+\usepackage{csquotes}
+% \usepackage{marvosym}
+% \usepackage{multirow}
+\usepackage{color}
+\newif\ifarxiv \arxivtrue  % set before macro.tex so the default is overridden
+\input{macro}
+\usetikzlibrary{matrix, shapes.geometric, arrows.meta, positioning}
+
+
+\newcommand{\toolname}[0]{{\sc VeriStruct}}
+
+%% Heading formatting for LNCS format
+% Provide lengths that influence the vertical space around headings in LNCS format.
+% The default is 1pt and it can be scaled down to remove vertical space.
+\makeatletter
+\newlength{\sectionspace}      \setlength{\sectionspace}{\p@}
+\newlength{\subsectionspace}   \setlength{\subsectionspace}{\sectionspace}
+\newlength{\subsubsectionspace}\setlength{\subsubsectionspace}{\subsectionspace}
+\newlength{\paragraphspace}    \setlength{\paragraphspace}{\subsubsectionspace}
+\newcommand{\addperiod}[1]{#1.}
+% The following is a copy of the relevant part of llncs.cls,
+% only with \p@ replaced by \sectionspace, \subsectionspace etc.
+% Prefer to do not change this directly to stay consistent with LNCS.
+\renewcommand\section{\@startsection{section}{1}{\z@}%
+                       {-18\sectionspace \@plus -4\sectionspace \@minus -4\sectionspace}%
+                       {12\sectionspace \@plus 4\sectionspace \@minus 4\sectionspace}%
+                       {\normalfont\large\bfseries\boldmath
+                        \rightskip=\z@ \@plus 8em\pretolerance=10000 }}
+\renewcommand\subsection{\@startsection{subsection}{2}{\z@}%
+                       {-18\subsectionspace \@plus -4\subsectionspace \@minus -4\subsectionspace}%
+                       {8\subsectionspace \@plus 4\subsectionspace \@minus 4\subsectionspace}%
+                       {\normalfont\normalsize\bfseries\boldmath
+                        \rightskip=\z@ \@plus 8em\pretolerance=10000 }}
+% Add a period to the end of subsubsection titles
+\renewcommand\subsubsection{\@startsection{subsubsection}{3}{\z@}%
+                       {-18\subsubsectionspace \@plus -4\subsubsectionspace \@minus -4\subsubsectionspace}%
+                       {  -0.5em \@plus -0.22em \@minus -0.1em}%
+                       {\normalfont\normalsize\bfseries\boldmath\addperiod}}
+\renewcommand\paragraph{\@startsection{paragraph}{4}{\z@}%
+                       {-12\paragraphspace \@plus -4\paragraphspace \@minus -4\paragraphspace}%
+                       {-0.5em \@plus -0.22em \@minus -0.1em}%
+                       {\normalfont\normalsize\itshape}}
+\makeatother
+
+% Squeeze vertical space around headings for LNCS.
+\setlength{\sectionspace}{0.7\sectionspace}
+\setlength{\subsectionspace}{0.7\subsectionspace}
+\setlength{\subsubsectionspace}{0.5\subsubsectionspace}
+\setlength{\paragraphspace}{0.5\paragraphspace}
+
+% Mark overfull boxes
+%\overfullrule=5mm
+
+\newcommand{\genfunc}[0]{\textbf{GenAnnos}}
+\newcommand{\fixfunc}[0]{\textbf{RepairAnnos}}
+
+
+\title{\toolname{}: AI-assisted Automated Verification of Data-Structure Modules in Verus}
+\author{Chuyue Sun\inst{1}\orcidlink{0009-0005-9226-3688} \and
+Yican Sun\inst{2}\orcidlink{0000-0002-0370-1676}\thanks{Work was accomplished while the author was visiting Stanford University.} \and
+Daneshvar Amrollahi\inst{1}\orcidlink{0000-0003-0954-7881} \and
+Ethan Zhang\inst{1} \and
+Shuvendu Lahiri\inst{3}\orcidlink{0000-0002-4446-4777} \and
+Shan Lu\inst{3}\orcidlink{0000-0002-0757-4600} \and
+David Dill\inst{1}\orcidlink{0000-0002-6189-0866} \and
+Clark Barrett\inst{1}\orcidlink{0000-0002-9522-3084}}
+\institute{Stanford University \and
+School of Computer Science, Peking University, Beijing, China \and
+Microsoft Research}
+%\newlist{compitem}{itemize}{4}
+%\setlist[compitem,1]{nolistsep,label=$\bullet$}
+
+% \renewcommand{\paragraph}[1]{\smallskip\noindent\textit{{\textit{#1.}}}}
+
+\newenvironment{talign}
+ {\let\displaystyle\textstyle\align}
+ {\endalign}
+\newenvironment{talign*}
+ {\let\displaystyle\textstyle\csname align*\endcsname}
+ {\endalign}
+
+\renewcommand{\paragraph}[1]{\medskip\noindent\textbf{#1.}}
+
+%%todonotes only on the right margin, to be disabled in the camera-ready version
+\makeatletter
+\@mparswitchfalse%
+\makeatother
+\normalmarginpar %for right-handed notes and lines, or
+%\reversemarginpar %if you want them on the left of your twosided document.
+
+%\renewcommand{\baselinestretch}{0.94}
+
+% Used for displaying a sample figure. If possible, figure files should
+% be included in EPS format.
+%
+% If you use the hyperref package, please uncomment the following line
+% to display URLs in blue roman font according to Springer's eBook style:
+% \renewcommand\UrlFont{\color{blue}\rmfamily}
+
+
+\begin{document}
+
+% Mostly about background
+
+\maketitle
+\begin{abstract}
+%Program verification is essential for ensuring software correctness, a task that has become increasingly critical as AI-generated code is often erroneous or insecure. However, verification is labor-intensive. To alleviate this burden, recent research explores AI-assisted automation but remains limited to verifying an individual function.
+
+We introduce \toolname{}, a novel framework that extends AI-assisted automated verification from single functions to more complex data structure modules in Verus. \toolname{} employs a planner module to orchestrate the systematic generation of abstractions, type invariants, specifications, and proof code. To address the challenge that LLMs often misunderstand Verus' annotation syntax and verification-specific semantics, \toolname{} embeds syntax guidance within prompts and includes a repair stage to automatically correct annotation errors.
+%
+%We evaluate \toolname{} on eleven benchmark modules from the Verus GitHub repository. \toolname{} successfully verifies ten modules and 106 out of 129 functions (82.2\%) overall—representing a substantial improvement over existing baselines and demonstrating the framework's effectiveness.
+%
+%the framework incorporates syntax guidance within prompts and adds a repair stage to correct errors in the annotations.
+%
+In an evaluation on eleven Rust data structure modules,  \toolname{} succeeds on ten of the eleven, successfully verifying 128 out of 129 functions (99.2\%) in total. These results represent an important step toward the goal of automatic AI-assisted formal verification.
+
+    %We present a framework that automatically synthesizes and checks formal specifications for data-structure implementations in Verus, a formal verifier for Rust.
+    %Given a Rust module and its unit tests, we defined a novel LLM workflow that verifies entire data-structure modules by synthesizing module-level abstractions--\texttt{View} traits and type invariants--alongside method contracts and proofs. Our work generalizes prior works that target the verification of a single method in isolation.
+    %Our work generalizes prior works that target the verification of a single method in isolation.
+    %Experimental results show that ..
+
+    %Given a Rust module and its unit tests, a tailored LLM workflow produces the required artifacts. Unlike prior work that targets single methods, our approach verifies entire data-structure modules by synthesizing module-level abstractions—view traits and type invariants—alongside method contracts and proofs. We also add specialized, syntax-aware repair procedures that iteratively fix errors in the generated artifacts.
+\end{abstract}
+
+
+\input{intro}
+\input{background}
+\input{challenges}
+\input{overview}
+\input{approach}
+%\input{framework}
+%\input{implementation}
+\input{evaluation}
+\input{related}
+\input{conclusion}
+\input{future-work}
+
+\paragraph{Data Availability Statement}
+The source code of \toolname{}, including all prompts and the benchmark suite used in our evaluation, is publicly available at \url{https://github.com/ChuyueSun/VeriStruct}.
+
+\paragraph{Funding}
+This work was funded in part by the Defense Advanced Research Projects Agency (DARPA) contract FA875024-2-1001, a gift from the Beneficial AI Foundation, and by the Stanford Center for Automated Reasoning.
+
+\FloatBarrier
+\newpage
+\bibliographystyle{splncs04}
+\bibliography{reference.bib}
+
+\newpage
+\appendix
+\input{appendix}
+
+\end{document}

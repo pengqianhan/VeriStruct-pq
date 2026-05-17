@@ -1,0 +1,25 @@
+\section{Related Work}
+\label{sec:related}
+
+Towards AI-assisted automated program verification, there is a long research line focusing on verifying the correctness of either an individual function~\cite{cav24llm,autoverus,dafnysinglemethod,loopy,lemur} or the type invariant for a given module~\cite{classinvgen}. In contrast, this paper targets the verification of data structure modules, which requires the synthesis of mathematical abstractions, structural invariants, and specifications and proof blocks spanning multiple methods. Consequently, none of the previous work can be applied in our setting.
+
+%Verilib~\cite{verilib} maintains a continually expanding repository of verified Rust and Verus implementations. The open-source library aggregates formally verified modules and supporting tooling, enabling practitioners to reuse verified components rather than developing them from scratch. By lowering the barrier to accessing high-assurance software and fostering shared benchmarks for automated verification, this initiative aims to accelerate progress in LLM-assisted verification techniques, including systems such as \toolname{}.
+
+Traditional formal-methods tools~(e.g., Frama-C~\cite{framac}, Why3~\cite{why3}, Dafny~\cite{dafny}, Coq~\cite{coq}, and Isabelle~\cite{isabelle}) provide strong correctness guarantees but require developers to manually construct detailed specifications and proofs. Thus, they impose substantial annotation overhead and demand significant expertise. In contrast, \toolname{} leverages large language models to automatically synthesize annotations. As a result, \toolname{} bridges the gap between fully manual formal verification and prior LLM-based assistants, achieving greater automation without sacrificing rigor.
+
+
+%While these systems excel at verifying complex properties, they impose substantial annotation overhead and demand significant expertise. In contrast, \toolname{} leverages large language models to automatically synthesize most required specifications, while retaining Verus as a soundness checker. In doing so, our approach bridges the gap between fully manual formal verification and prior LLM-based assistants, achieving greater automation without compromising rigor.
+
+
+
+%Compared with these works, this paper focuses on the verifying a data-structure module, which requires the synthesis of mathematical abstractions, structural invariants, and specifications and proof blocks of multiple methods. Thus, none of these previous works are applicable to our task.
+
+%Beyond these research projects,
+%Verilib~\cite{verilib} curates a growing repository of verified Rust and Verus implementations that our approach complements. The open-source library aggregates formally verified modules and supporting tooling so that practitioners can reuse proven components rather than rebuilding them from scratch. By lowering the barrier to accessing high-assurance code and growing shared benchmarks for automated verification, the initiative seeks to amplify future LLM-assisted verification techniques alongside systems like \toolname{}.
+
+
+
+%Early efforts focus on using LLMs to suggest loop invariants or ghost code for small programs\cite{le2019sygus, chen2023codex}. Recent systems employ iterative prompting and automated repair to verify end-to-end correctness\cite{jiang2023gentest}. \toolname{} builds on this work by targeting full data-structure modules in Verus and introducing syntax-aware repair agents.
+
+
+

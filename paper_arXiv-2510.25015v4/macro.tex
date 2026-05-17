@@ -1,0 +1,187 @@
+% -----------------------------------------------------------------------------
+% Draft toggle for notes and callouts
+% Usage:
+%   - Default: drafttrue (notes enabled)
+%   - To disable in camera-ready: add `\draftfalse` BEFORE `\input{macro}`
+% -----------------------------------------------------------------------------
+\newif\ifdraft
+\drafttrue
+
+
+\ifdraft
+  \RequirePackage{todonotes}
+\else
+  \RequirePackage[disable]{todonotes}
+\fi
+
+% TODOS (margin width can be tuned per template)
+%\setlength{\marginparwidth}{1.5cm}
+
+% Author comments and callouts
+\ifdraft
+  \newcommand{\cmscomment}[1]{\todo[color=blue!10,size=\small,fancyline,author=CMS]{#1}\xspace}
+  \newcommand{\cmscommentinline}[1]{\todo[inline,color=blue!10,author=CMS]{#1}\xspace}
+  \newcommand{\atcms}{\colorbox{blue!10}{\textit{@CMS}}}
+  \newcommand{\yican}[1]{\todo[color=red!10,size=\small,fancyline,author=Yican]{#1}\xspace}
+  \newcommand{\atyican}{\colorbox{red!10}{\textit{@Yican}}}
+  \newcommand{\yxcomment}[1]{\todo[color=magenta!10,size=\small,fancyline,author=Yingfei]{#1}\xspace}
+  \newcommand{\atxyf}{\colorbox{magenta!10}{\textit{@Yingfei}}}
+  \newcommand{\ruyicomment}[1]{\todo[color=blue!10,size=\small,fancyline,author=Ruyi]{#1}\xspace}
+  \newcommand{\atruyi}{\colorbox{blue!10}{\textit{@Ruyi}}}
+\else
+  \newcommand{\cmscomment}[1]{}
+  \newcommand{\cmscommentinline}[1]{}
+  \newcommand{\atcms}{}
+  \newcommand{\yican}[1]{}
+  \newcommand{\atyican}{}
+  \newcommand{\yxcomment}[1]{}
+  \newcommand{\atxyf}{}
+  \newcommand{\ruyicomment}[1]{}
+  \newcommand{\atruyi}{}
+\fi
+
+
+%% You could instead use the 'disable' option of todonotes
+% \renewcommand{\cmscomment}[1]{}
+% \renewcommand{\cmscommentinline}[1]{}
+% \renewcommand{\atcms}{}
+% \renewcommand{\yican}[1]{}
+% \renewcommand{\atyican}{}
+% \renewcommand{\yxcomment}[1]{}
+% \renewcommand{\atxyf}{}
+% \renewcommand{\ruyicomment}[1]{}
+% \renewcommand{\atruyi}{}
+
+%\newcommand{\ruyicomment}[1]{\textcolor{blue}{\textit{Ruyi:} #1}}
+
+\newcommand{\eeq}{~{}={}~}
+\newcommand{\ar}{\mathsf{ar}}
+\newcommand{\kwtick}{\mathtt{pre}}
+\newcommand{\kwinvoke}{\mathtt{invoke}}
+\newcommand{\kwsample}{\mathtt{sample}}
+\newcommand{\kwin}{\mathtt{in}}
+\newcommand{\kwwith}{\bigoplus}
+\newcommand{\com}{\mathsf{comm}}
+\newcommand{\expr}{\mathsf{size}}
+\newcommand{\pp}{\mathsf{expr}}
+%\renewcommand{\skip}{\mathtt{skip}}
+\newcommand{\dist}{\mathsf{dist}}
+\newcommand{\etf}{\mathsf{Tf}}
+\newcommand{\hm}{\mathsf{Hm}^{\mathsf{ub}}}
+\newcommand{\emp}{\mathsf{emp}}
+\newcommand{\body}{\mathsf{body}}
+\newcommand{\rbody}{\mathsf{call}}
+%\newcommand{\sem}[1]{\llbracket{#1}\rrbracket}
+\newcommand{\sem}[1]{#1}
+\newcommand{\pspace}{\mathrm{\Omega}}
+\newcommand{\probspace}{(\pspace,\mathcal F,\Pr)}
+\newcommand{\supp}{\mathrm{supp}}
+\newcommand{\ex}{\mathsf{Ex}}
+\newcommand{\prrlang}{{\sl LRec}}
+
+\newcommand{\coef}{c}
+\newcommand{\spolya}{p}
+\newcommand{\sloga}{q}
+\newcommand{\spolyn}{u}
+\newcommand{\slogn}{v}
+\newcommand{\coeff}{\coef_f}
+\newcommand{\coeft}{\coef_t}
+\newcommand{\logfa}{\sloga_{f}}
+\newcommand{\logfn}{\slogn_{f}}
+\newcommand{\polyfa}{\spolya_{f}}
+\newcommand{\polyfn}{\spolyn_{f}}
+\newcommand{\logta}{\sloga_{t}}
+\newcommand{\logtn}{\slogn_{t}}
+\newcommand{\polyta}{\spolya_{t}}
+\newcommand{\polytn}{\spolyn_{t}}
+
+\newcommand{\signature}{\theta}
+\newcommand{\vardomain}{V}
+
+
+\newcommand{\varmap}{\alpha}
+\newcommand{\prog}{R}
+\newcommand{\cont}{\mathbf{K}}
+\newcommand{\cost}{C}
+\newcommand{\conf}{\mu}
+
+\newcommand{\seq}{\com_1;\com_2}
+\newcommand{\invoke}{\kwinvoke\ p(\expr)}
+\newcommand{\with}{\kwwith_{i=1}^k c_i\!:\!\com_i}
+\newcommand{\sample}{\kwsample\ v\leftarrow\dist\ \kwin\ \{\body\}}
+\newcommand{\tick}{\kwtick(\expr)}
+\newcommand{\transprob}{\mathbf{P}}
+
+\renewcommand{\paragraph}[1]{\smallskip\noindent{\textit{{#1.}}}}
+
+%\newcommand{\todo}[1]{{\color{red} \it \{TODO: {#1}\}}}
+
+\newcommand{\Nset}{\mathbb N}
+\newcommand{\Zset}{\mathbb Z}
+\newcommand{\Rset}{\mathbb R}
+\newcommand{\Cset}{\mathbb C}
+\newcommand{\proc}{\mbox{\sl proc}}
+\newcommand{\fsdpd}{FSDPD}
+\newcommand{\algexp}{\textsc{ExpSyn}}
+\newcommand{\algpoly}{\textsc{PolySyn}}
+
+\newcommand{\uniform}[1]{\textsc{Uniform}(#1)}
+\newcommand{\muniform}[1]{\textsc{MUniform}(#1)}
+\newcommand{\fbound}{\theta}
+
+\newcommand{\pd}{\eta}
+\newcommand{\condexpv}[2]{\expv\left[#1\ |\ #2\right]}
+\newcommand{\dtsp}{\Gamma}
+
+%%old macros from our previous submission
+%\newcommand{\stack}{\mathcal S}
+\newcommand{\coststack}{\mbox{\sl S}}
+\newcommand{\eqtot}{m}
+\newcommand{\recnum}{S}
+\newcommand{\probm}{\Pr}
+\newcommand{\sysnum}{O}
+\newcommand{\fset}{\mathbb T}
+\newcommand{\nset}{\mathbb N}
+%\newcommand{\transf}{\mathcal P}
+\newcommand{\transf}{f}
+%\newcommand{\stacktrans}{\mathcal A}
+\newcommand{\prev}{\mathcal O}
+\newcommand{\lef}{{\le}_{\fspace}}
+\newcommand{\sprr}{\Delta}
+%\newcommand{\sprr}{\mathsf R}
+\newcommand{\leinf}{{\le}_{\infspace}}
+\newcommand{\botf}{{\bot}_{\fspace}}
+\newcommand{\botinf}{{\bot}_{\infspace}}
+\newcommand{\epxv}{\mathbb E}
+\newcommand{\expv}{\epxv}
+\newcommand{\tstack}{\mathcal A}
+\newcommand{\cstack}{\mathcal Q}
+%\renewcommand{\time}{T}
+%\newcommand{\martingale}{\mathcal M}
+\newcommand{\martingale}{\Psi}
+\newcommand{\nxt}[1]{\mbox{\sl next}_{#1}}
+\newcommand{\rtop}{\widehat{r}}
+\newcommand{\ntop}{\widehat{n}}
+\newcommand{\btop}{\widehat{\beta}}
+\newcommand{\sktop}{\widehat{\sigma}}
+\newcommand{\REC}{\mbox{\sl Rec}}
+\newcommand{\BINOM}{\mbox{\sl Binom}}
+\newcommand{\task}[1]{\textsc{#1}}
+% Put your macros here
+\newcommand{\livia}[1]{\textcolor{BrickRed}{#1}}
+\newcommand{\hf}[1]{{#1}}
+
+ %for qedT mark compatible within displaymath
+\def\triangleforqed{\hbox{$\lhd$}}
+\makeatletter
+\DeclareRobustCommand{\qedT}{%
+	\ifmmode
+	\eqno \def\@badmath{$$}%$$
+	\let\eqno\relax \let\leqno\relax \let\veqno\relax
+	\hbox{\triangleforqed}%
+	\else
+	\leavevmode\unskip\penalty9999 \hbox{}\nobreak\hfill
+	\quad\hbox{\triangleforqed}%
+	\fi
+}
+\makeatother

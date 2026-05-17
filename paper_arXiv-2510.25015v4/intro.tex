@@ -1,0 +1,108 @@
+\section{Introduction}
+\label{sec:intro}
+
+The power of generative AI introduces new risks to our critical digital infrastructure.  AI systems have a remarkable ability to analyze code, making it much easier for a malicious actor to find and exploit vulnerabilities~\cite{BBB+23}.  At the same time, more and more code is being written by or with the assistance of AI systems.  While it is true that such AI systems can greatly increase the productivity of programmers, they can also introduce additional correctness errors and security vulnerabilities~\cite{insecure1,bug1}.  Thus, productivity gains come at the risk of churning out mountains of buggy, insecure code.
+
+Program verification can mitigate these risks by mathematically proving that code---whether human-written or AI-generated---is free of bugs and vulnerabilities.
+However, program verification relies on the addition of sophisticated \emph{logical annotations} to code, including preconditions, postconditions, invariants, and auxiliary proof blocks.  These annotations, which we also refer to as \emph{specifications}, are used to generate verification conditions, which are then proved automatically by automated reasoning tools like satisfiability modulo theories (SMT) solvers~\cite{BSST21}.
+The application of program verification in practice has been severely limited because of the enormous effort and expertise required to create such annotations.
+
+Fortunately, the power of generative AI is also shifting the calculus on the practicality of program verification.  Recently, there have been encouraging results on using large language models (LLMs) to \emph{automatically} specify and verify software~\cite{clover,cav24llm,autoverus,classinvgen,dafnysinglemethod}.
+Our work aims to build on these efforts with the vision of one day making it possible to have AI-assisted program verification at scale and verified libraries of reusable code~\cite{verilib}.
+
+So far, AI-assisted verification efforts have focused on simple textbook algorithms consisting of a single function.
+In this paper, we extend this by developing a novel workflow for the verification of data structure modules. The ability to verify data structures is a crucial advance since: (1) data structures are ubiquitous in everyday programming, forming the foundation of many software systems; and (2) verifying library data structures lowers the burden for verifying more complex code, as client code can then rely on the correctness of these already-proven components.
+
+We implement our workflow in \toolname{}, an AI-assisted automated verification framework for Verus~\cite{verus,verus-practical}.  Verus is a state-of-the-art program verification extension for Rust. We target Verus because it has been successfully applied to the construction of verified systems~\cite{verus-practical}, and its design allows developers to write verification annotations using a syntax closely aligned with Rust. This design not only lowers the barrier for Rust engineers to adopt formal verification but also positions Verus to have an increasing impact as Rust continues to gain traction in mainstream software development. 
+
+%\toolname{} begins with a Rust module that implements the data structure intended for verification, and a collection of unit tests. The unit tests serve to ensure that the specifications cover the implemented features, that the generated formal specifications align with the developer's intent, and that specifications are not trivial or vacuous~\cite{test-intent}.
+
+%The unit tests exercise the intended usage and check expected behavior of the data structure. It 
+
+%it additionally requires formal specifications to encode user's intent as well as proof constructs, such as loop invariants and auxiliary assertions to establish the adherence of the implementation to these specifications.
+
+
+
+ %Program verification can fundemantally avoid errors  
+
+
+%make proving the consistency of the implementation and specifications feasible.
+
+%A typical workflow begins by implementing the target program in a proof-oriented language (e.g., Dafny~\cite{dafny}, Frama-C~\cite{framac}, or Verus~\cite{verus,verus-practical}). The implementation is then augmented with \emph{annotations}, which precisely captures the intended behavior of the program. This code includes:
+%\begin{enumerate}
+%    \item Formal specifications, such as preconditions and postconditions; and
+%    \item Formal proof constructs, such as loop invariants and auxiliary assertions, that establish the adherence of the implementation to these %specifications.
+%\end{enumerate}
+%Once the program and its annotations are in place, an automated prover (e.g., Z3~\cite{z3} or CVC5~\cite{cvc5}) is invoked to verify that the program satisfies its specifications, thereby establishing the correctness of the software. While this process is highly rigorous, it remains labor-intensive and technically challenging, often demanding substantial manual effort~\cite{verus,dafnybench}.
+
+
+%To make LLM-assisted deductive verification more practical, the next significant milestone is the automatic verification of data-structure modules. This problem is a central task in program verification for two key reasons: (1) data structures are ubiquitous in everyday programming, forming the foundation of many software systems; and (2) verifying library data structures lowers the burden on proof developers, who can then verify client code that relies on these already-proven components with greater ease.
+
+%Motivated by this challenge, we propose \toolname{}, which to our knowledge is the first LLM-assisted framework designed for the automatic verification of data-structure implementations in \emph{Verus}~\cite{verus,verus-practical}. We target Verus because it is a state-of-the-art verifier built on top of the Rust programming language~\cite{rust}. Verus has been successfully applied to the construction of verified systems~\cite{verus-practical}, and its design allows developers to write verification annotations using a syntax closely aligned with Rust. This design not only lowers the barrier for Rust engineers to adopt formal verification but also positions Verus to have an increasing impact as Rust continues to gain traction in mainstream software development. Consequently, advances in LLM-assisted verification within the Verus ecosystem stand to benefit both the verification community and the broader Rust community.
+
+
+%\paragraph{Input to Our Framework}
+The input to \toolname{} consists of 
+the Rust source code for the module to be verified and a unit test suite that illustrates the intended usage and expected behavior of the data structure. The test suite serves a dual purpose: it helps ensure that the generated formal specifications align with the developer's intent, and it helps rule out trivial or vacuous specifications~\cite{test-intent}.
+%a unit test suite that illustrates the intended usage and expected behavior of the data structure. The test suite serves to ensure that the generated specifications align with developer intent and to rule out trivial or vacuous specifications. %[The unit test can be written by the user, or automatically generated by LLM].
+%\end{enumerate}
+%
+%\paragraph{Output of Our Framework}
+\toolname{} automatically augments the provided Rust implementation with annotations needed for program verification. This augmented code, together with the provided unit test suite, are then sent to the Verus verifier, which attempts to formally verify the assertions in the test suite. If the verification check succeeds, the formally verified code is returned to the user.  Otherwise, \toolname{} attempts to extend or repair the annotations based on the feedback from the verifier. %A concrete example of this process is presented below.
+
+
+%\paragraph{Challenges}
+We highlight two challenges for LLM-assisted verification of data-structure modules.
+The first challenge is that verifying data structures is inherently more complex than verifying a single function. Specifically, data-structure verification often requires two additional elements:
+($i$) a suitable mathematical abstraction that allows the verifier to reason logically about the data structure~\cite{reynolds-seplogic,parkinson-bierman,ohearn-cacm}; and ($ii$)
+so-called \emph{type invariants} that must be preserved by operations on the data structure~\cite{classinvgen,pldi-invariant}.
+Moreover, data-structure modules usually expose multiple methods that must be verified jointly under a shared type invariant. This stands in contrast to other recent approaches, which focus on generating a single specification artifact (e.g., proof blocks for an individual function or automated synthesis of class invariants)~\cite{autoverus,dafny-annotator,dafnysinglemethod,cav24llm,classinvgen,lemur,loopy}. In short, our verification task extends beyond the scope of these existing techniques.
+
+The second challenge lies in the LLMs' limited understanding of Verus' specialized syntax and verification-specific semantics. For instance, annotations in Verus are only allowed to invoke ``specification functions,'' which cannot modify global state. However, the LLM sometimes suggests invoking a regular Rust function. Such deficiencies primarily stem from the scarcity of Verus code in existing training data.
+
+%the model occasionally invokes executable functions when generating specifications--an operation disallowed in Verus because such functions may modify global states, violating the purity required of logical specifications. This deficiency primarily stems from the scarcity of Verus code in existing training data, which prevents LLMs from gaining sufficient exposure to its unique verification constructs and semantics, thereby hindering their proficiency in producing correct Verus code.
+
+%struggle to generate even syntactically correct Verus code. 
+
+%The third challenge is that, even when the syntax is correct, LLMs lack a robust understanding of Verus's  Constructs such as ghost modes, specification-only types, and proof combinators extend beyond standard Rust and are tightly coupled with the logical discipline enforced by the verifier. As a result, the model frequently proposes specifications or invariants that are semantically incompatible with the verification rules, leading to proofs that fail to discharge.
+
+
+%\paragraph{Our Approach}
+To address the first challenge, we build on previous work~\cite{autoverus} by adding two new modules: (1) a \emph{View} module responsible for producing a mathematical abstraction of the data structure; and (2) a \emph{Type Invariant} module, responsible for producing type invariants.  For each component, we design dedicated system and user prompts that clearly articulate the task. These prompts include: (1) the objective of the component; (2) relevant background information to help the LLM better understand the task; (3) step-by-step instructions and the required output format; and (4) in-context learning examples~\cite{incontextlearning}.
+Additionally, because not all verification components are necessary for every task, we introduce a \emph{planner} module, which analyzes the verification task as an initial step and decides which components need to be generated.
+
+To address the second challenge, we pursued two approaches. First, we developed a suite of automated repair modules to identify and correct errors in the generated annotations. Compared with the previous work~\cite{autoverus} which focused solely on repairing proof blocks, we further introduce dedicated repair modules targeting views, type invariants, and specifications. Specifically, to facilitate the joint verification of multiple methods and tests, \toolname{} includes a repair module that refines specifications whenever the verifier reports a failed test verification. Second, we embedded structured syntax guidelines into the prompt to mitigate syntax errors in generated annotations. We sourced these guidelines from the Verus tutorial~\cite{verus-tutorial} and from standard Verus libraries~\cite{verus-stdlib}.
+
+% Each generation and repair module has its own specifically-designed syntactic guidelines.
+
+%First, we embedded syntax guidelines into the prompt to mitigate syntax errors in generated annotations. We take these guidelines from Verus tutorial~\cite{verus-tutorial} and standard libraries~\cite{verus-stdlib}. Each module has a dedicated these guidelines are modularized into chapters, and only the chapters relevant to the current verification task are included. We choose these guidelines statically. Second, we develop a suite of automated repair modules to identify and correct errors in the generated annotations. In contrast to prior work~\cite{autoverus}, which focused solely on repairing proof blocks, our approach generalizes this capability by introducing dedicated repair modules targeting the mathematical abstraction, type invariants, and specification components, thereby achieving broader and more reliable correction coverage. %Table~\ref{tab:repair-heuristics} catalogues these repair heuristics alongside the specific failure modes they target.
+
+%Table~\ref{tab:repair-heuristics} catalogues these heuristics alongside the failure modes they target.
+
+%We detail the end-to-end workflow, including the planner, inference modules, and repair strategies, in \Cref{sec:approach}.
+
+%For example, LLMs often incorrectly invoke the type-invariant function within specifications—perhaps influenced by training data from other proof-oriented languages such as Dafny~\cite{dafny}. However, in Verus, the type-invariant function is private and cannot be invoked in specifications. To address this, we develop a dedicated module that removes any such invocations.
+
+%\paragraph{Evaluation}
+We evaluate \toolname{} on eleven data-structure benchmarks drawn from Verus examples and third-party code. Our framework automatically produces verified implementations for ten of these benchmarks while substantially reducing the amount of handwritten annotation required from developers.
+When writing unit tests, we observe that achieving high coverage is both challenging and labor-intensive. To alleviate this burden, we apply LLM-assisted techniques to automatically generate unit test cases.
+
+%\paragraph{Our Contribution}
+To summarize, this paper makes the following key contributions:
+\begin{enumerate}
+    \item we introduce a new LLM-assisted workflow for generating program verification annotations for data-structure modules;
+    \item we provide an implementation of our workflow in the \toolname{} tool; and
+    \item we evaluate \toolname{} on eleven data structure benchmarks, demonstrating its effectiveness.
+\end{enumerate}
+
+The prompt and source code of \toolname{} is available on GitHub~\cite{artifact}.
+
+\begin{comment}
+A common approach to data structure verification involves:
+\begin{enumerate}
+\item implementing the data structure in a proof-oriented language (e.g., Frama-C~\cite{framac}, Dafny~\cite{dafny}, or Verus~\cite{verus}); and
+\item annotating the code with specifications that describe the intended functionality of each function, along with correctness proofs demonstrating that the implementation satisfies these specifications.
+\end{enumerate}
+Once these steps are complete, an SMT-based verifier will check the correctness of both the specifications and the accompanying proofs. 
+However, writing specifications and proofs require significant human efforts. 
+\end{comment}

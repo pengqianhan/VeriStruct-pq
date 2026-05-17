@@ -1,0 +1,10 @@
+\begin{comment}
+\section{Unique Challenges of Verifying Data Structures}
+Verifying data structures is a pivotal milestone for automated deductive verification because these modules appear in nearly every program, and establishing their correctness relieves downstream clients from repeating the same reasoning burden.
+
+Unlike pure functional code, data-structure verification first demands a crisp mathematical abstraction---such as the \texttt{View} trait in Verus---and a robust invariant that collectively capture how the concrete representation aligns with its logical model and which properties must be maintained across all operations. Reasoning about this pair of specifications requires global insight into the entire module: the \texttt{View} trait and class invariant must stay consistent across all methods simultaneously, rather than being checked for one function at a time as is often sufficient in purely functional programs. This global coupling also forces us to manage context more deliberately when steering an LLM, ensuring that the model can keep the shared specification fragments in focus instead of fragmenting them across separate prompts.
+
+Each method in a data-structure module must then be proved correct while respecting the shared invariant, forcing the verifier to reason about interdependent behaviors rather than isolated routines, a scope that exceeds many prior single-method automation techniques.
+
+Finally, automation is further strained by the scarcity of Verus-specific training data, making it difficult for language models to emit even syntactically valid proofs without additional repair mechanisms tailored to this ecosystem.
+\end{comment}

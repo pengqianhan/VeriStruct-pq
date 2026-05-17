@@ -1,0 +1,29 @@
+\section{Supplementary Material}
+\label{appendix:supp}
+
+\Cref{tab:repair-heuristics} summarizes the specialized repair heuristics used by \toolname{}, the failure classes they target, and representative corrective actions.
+
+\begin{table}[h]
+  \caption{Specialized repair heuristics, the failure classes they target, and representative actions.}
+  \label{tab:repair-heuristics}
+  \begin{small}
+  \begin{tabular}{p{0.15\textwidth}p{0.30\textwidth}p{0.42\textwidth}}
+    \hline
+    \textit{Heuristic} & \textit{Primary failures} & \textit{Representative actions} \\
+    \hline
+    Syntax & Parser and sequence syntax errors & Insert missing \texttt{view()} calls or lemmas, balance delimiters, correct operators/generics \\
+    Type & Type mismatches, constructor invariant failures & Rewrite expressions, add explicit generics (e.g., \texttt{None::<T>}), patch missing \texttt{requires} clauses \\
+    Arithmetic & Nonlinear reasoning, overflow/underflow & Emit \texttt{by(nonlinear\_arith)} proofs, assert bounds, strengthen loop invariants \\
+    Precondition & Preconditions, vector bounds, private access & Introduce proof blocks, assert length/index constraints, adjust permission-violating calls \\
+    Postcondition & Failing \texttt{ensures} clauses & Add exit proofs, tune invariants, expose ghost accessors for private fields \\
+    Invariant & Loop invariant failures pre-/post-loop & Assert invariants before loops, propagate conditions, revise invalid invariants \\
+    Missing Element & Absent imports or trait implementations & Insert \texttt{use} statements, synthesize required trait methods with contracts \\
+    Mode & Mode mismatches, visibility issues & Wrap calls in spec/proof blocks, retag functions, set open/closed attributes \\
+    Old-Self & Missing \texttt{old(self)} references & Rewrite \texttt{self.} in \texttt{requires} blocks to \texttt{old(self).} \\
+    Assertion & Failed assertions, test expectations & Add reveals or lemmas and lift tests into postconditions \\
+    Decrease & Unsatisfied \texttt{decreases} obligations & Prove measure drops, adjust \texttt{decreases} expressions, update loop variables \\
+    Inv.\ Removal & Redundant invariant invocations & Delete unnecessary \texttt{self.inv()} calls enforced by type invariant attributes \\
+    \hline
+  \end{tabular}
+  \end{small}
+\end{table}

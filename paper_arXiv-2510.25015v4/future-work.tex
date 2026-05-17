@@ -1,0 +1,14 @@
+We conclude with several promising directions for future work.
+%
+%\paragraph{Toward a More Versatile Framework}
+A natural next step is to extend \toolname{} to support more complex verification tasks. First, we could integrate retrieval-augmented generation (RAG)~\cite{RAG}, which could help identify useful lemmas from the Verus standard library~\cite{vstd}, strengthening proof synthesis. Second, we could additionally support the synthesis of Verus' resource algebra library~\cite{verus-practical} for verifying complex concurrent data structures. Finally, applying constrained decoding techniques~\cite{constrained-decoding} could alleviate syntax errors in generated annotations.
+
+%Verus includes a built-in resource algebra library~\cite{verus-practical} for verifying concurrent Rust programs. By extending our LLM-assisted framework to automatically construct resource algebra objects, we can potentially enable automated verification of concurrent data structures in Rust. In addition, incorporating techniques from constrained decoding~\cite{constrained-decoding} could further reduce syntax errors and improve the overall reliability of generated proofs.
+
+\paragraph{Automatic Unit Test Generation}
+At present, our approach requires users to manually provide a comprehensive unit test suite. However, constructing such suites, especially those that achieve high coverage and include corner cases, can be both time-consuming and error-prone. Recent studies have shown that large language models are highly capable of generating high-quality test cases, including those targeting rare or edge conditions~\cite{highcovtest,liu2025llmpoweredtestcasegeneration}. Building on these advances, we plan to incorporate LLM-based unit test generation into our framework, thereby further reducing manual effort and enhancing the completeness of the verification process.
+
+\paragraph{Reinforcement Learning for Verification}
+Another promising direction is to apply reinforcement learning (RL) to specification inference and proof generation. The Verus verifier provides a natural reward signal: successful verification yields positive feedback, while failed verification attempts with diagnostic messages can guide policy updates. By training models to optimize for verification success, RL could enable more effective exploration of the specification and proof search space, potentially discovering annotation strategies that are difficult to obtain through prompting alone.
+
+% Constraint Decoding: Control the output to ensure the 

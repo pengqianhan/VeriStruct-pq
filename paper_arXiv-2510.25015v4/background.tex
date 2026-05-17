@@ -1,0 +1,184 @@
+
+\begin{figure*}[htbp]
+\begin{minipage}[t]{0.5\linewidth}
+\begin{lstlisting}[language=Rust,style=boxed,showstringspaces=false,
+firstnumber=1,
+linebackgroundcolor={%
+    \ifthenelse{
+    \value{lstnumber} > 7 \AND \value{lstnumber} < 39
+    }
+    {\color{green!10}}{}
+    },
+]
+verus!{ // Indicates the Verus environment
+
+pub struct RingBuffer<T: Copy> {
+    ring: Vec<T>,
+    head: usize,
+    tail: usize,
+}
+// The View trait, which tells the Verus verifier
+// how to logically represent RingBuffer
+impl<T: Copy> View for RingBuffer<T> {
+    type V = (Seq<T>, usize);
+    closed spec fn view(&self) -> Self::V {
+        let cap = self.ring.len();
+        let content = 
+        if self.tail >= self.head {
+            (self.ring)@.subrange(
+                self.head as int, self.tail as int
+            )
+        } else {
+            (self.ring)@.subrange(
+                self.head as int, cap as int
+            ).add((self.ring)@.subrange(
+                0, self.tail as int
+            ))
+        };
+        (content, cap)
+    }
+}
+\end{lstlisting}
+\end{minipage}
+\begin{minipage}[t]{0.5\linewidth}
+\begin{lstlisting}[language=Rust,style=boxed,showstringspaces=false,
+firstnumber=28,
+linebackgroundcolor={%
+    \ifthenelse{
+    \value{lstnumber} > 28 \AND \value{lstnumber} < 37 \OR
+    \value{lstnumber} > 37 \AND \value{lstnumber} < 43 \OR
+    \value{lstnumber} > 47 \AND \value{lstnumber} < 50 \OR
+    \value{lstnumber} > 50 \AND \value{lstnumber} < 54
+    }
+    {\color{green!10}}{}
+    },
+]
+impl RingBuffer<T> {
+    // The type invariant, specifying the properties that
+    // RingBuffer object must satisfy
+    #[verifier::type_invariant]
+    closed spec fn inv(&self) -> bool {
+        &&& self.head < self.ring.len()
+        &&& self.tail < self.ring.len()
+        &&& self.ring.len() > 0
+    }
+    pub fn new(ring: Vec<T>) -> (ret: RingBuffer<T>)
+    requires
+        ring.len() >= 1
+    ensures
+        ret@.0.len() == 0,
+        ret@.1 == ring.len() as nat
+    {
+        // Create an empty ring buffer
+        RingBuffer { head: 0, tail: 0, ring }
+    }
+    pub fn is_full(&self) -> (ret: bool)
+    ensures
+        ret == (self@.0.len() == (self@.1 - 1) as nat)
+    {
+        proof {
+            use_type_invariant(&self);
+        }
+        self.head == ((self.tail + 1) % self.ring.len())
+    }
+    pub fn enqueue(&mut self, val: T) -> (succ: bool) { ... }
+    pub fn dequeue(&self) { ... }
+}
+fn test_ring_buffer() { /* Unit tests (omitted). */ }
+fn main() { test_ring_buffer(); }
+} // End of verus!
+\end{lstlisting}
+\end{minipage}
+\caption{Verified Ring Buffer, Lines Highlighted in Green are Annotations}
+\label{fig:ring-buffer-verified}
+\end{figure*}
+
+\section{Preliminaries: Verifying a Data-Structure in Verus}
+\label{sec:background}
+
+In this section, we provide background on deductive verification and Verus.  We start by introducing an example that will be used to illustrate key concepts throughout the paper.
+
+\begin{example}[Verified Ring Buffer]
+\label{ex:rb}
+A ring buffer is a fixed-size data structure that treats memory as a circular array.  Ring buffers are widely used in streaming, networking, and real-time systems~\cite{tock,knuth1997art}. \Cref{fig:ring-buffer-verified} shows the Rust implementation for a ring buffer, including the Verus annotations necessary for verifying key properties of the implementation.\qed    
+\end{example}
+
+Generally speaking, deductive program verification augments programs with \emph{logical annotations}.  %Specifications state what must be true about the code.
+These annotations connect directly to correctness: the verifier generates proof obligations from the code and annotations; if all obligations are proved, then the implementation is correct with respect to the annotations. Otherwise, the verifier produces an error message. Below, we describe the different categories of annotations available in the Verus program verification framework.
+
+\paragraph{Specification Functions}
+In Verus, functions are classified into two categories: \emph{specification functions} and \emph{executable functions}. Specification functions, marked with the \texttt{spec} keyword (e.g., \texttt{view} and \texttt{inv} in \Cref{fig:ring-buffer-verified}), are pure and cannot modify any global or mutable state. They are simply logical definitions of pure functions without side effects and are called exclusively from specifications, invariants, and proofs. In contrast, executable functions (e.g., \texttt{new}, \texttt{is\_full}, \texttt{enqueue}, and \texttt{dequeue}) define concrete program behavior and may modify state. When writing annotations, only specification functions can be called, since annotations must remain side-effect-free and semantically independent of execution.
+
+\paragraph{Pre- and Postconditions}
+Annotations include preconditions and postconditions for each function. The implicit program requirement is that: if a function is invoked with a program state satisfying the precondition, then it will return (or terminate) in a state satisfying the postcondition. In Verus, one uses the keywords \texttt{requires} (Lines~38--39) and \texttt{ensures} (Lines~40--41, 48--49) for specifying preconditions and postconditions, respectively. The verifier checks that every call site meets the callee's preconditions and that every function body establishes its postconditions from the assumed preconditions. 
+
+\paragraph{Proof Blocks}
+Implementation code may include \emph{proof blocks} embedded in the code.  These blocks provide hints to the verifier to help it discharge difficult proof obligations (Lines 51--53 in \Cref{fig:ring-buffer-verified}). 
+
+Verus includes two additional constructs that are helpful when verifying data structure modules: views and type invariants.
+
+\paragraph{View Traits}
+The \emph{view trait} in Verus establishes a bridge between the concrete implementation of a data structure and its abstract mathematical representation used in specifications.
+It requires implementing a \texttt{view()} function, which defines how an instance of a data structure maps to a logical object that the verifier can reason about. %This logical object is purely conceptual, it exists only during verification and allows specifications and proofs to focus on the logical behavior rather than the implementation details. 
+While one could theoretically encode a data structure's state as a Cartesian product of all its fields, defining a custom view offers better abstraction, clarity, and proof efficiency, allowing specifications and proofs to focus on the logical behavior rather than the implementation details.
+
+Once the view is implemented, specifications can refer to the logical abstraction using \texttt{a.view()} or its shorthand \texttt{a@}. Verus provides built-in specification types such as \texttt{nat}, \texttt{Seq<T>}, \texttt{Set<T>}, and \texttt{Map<K,V>} to represent natural numbers, sequences, sets, and maps, respectively. These types serve as good building blocks for implementing views.
+
+\begin{example}
+\label{ex:view-bg}
+In \Cref{fig:ring-buffer-verified}, the \texttt{View} for \texttt{RingBuffer}~(Lines 8--28) abstracts the buffer as a pair (\texttt{Seq<T>}, \texttt{usize}). The first element in the pair is a mathematical sequence (\texttt{Seq<T>}) that reflects the elements currently stored in the buffer in order, starting from the element at \texttt{head} and continuing up to (but not including) the element at \texttt{tail}. The second element in the pair is the capacity of the ring buffer. To implement the view function, we slice and concatenate segments of the underlying ring according to the positions of \texttt{head} and \texttt{tail}, while hiding \texttt{head} and \texttt{tail} themselves.
+
+This logical view abstracts the circular implementation, enabling specifications for buffer operations--like enqueue and dequeue--to be written as simple sequence transformations (e.g., appending or removing elements), without dealing with low-level index arithmetic or memory layout details.
+\end{example}
+
+\paragraph{Type Invariants}
+\label{ex:invariant-bg}
+%Second, we introduce the concept of \textit{type invariants}.
+A \emph{type invariant} is a logical formula that all instances of a data structure must satisfy. In Verus, one declares a type invariant using the \texttt{\#[verifier::type\_invariant]} attribute. We can call \texttt{use\_type\_invariant} (Line~51) within a proof block to make invariant facts available in the current proof context.
+
+\begin{example}
+In \Cref{fig:ring-buffer-verified} (Lines 29--36), the ring buffer invariant states that \texttt{head} and \texttt{tail} are valid indices and that the ring has positive capacity.
+\end{example}
+
+
+\begin{comment}
+\begin{figure*}[htbp]
+\begin{lstlisting}[language=Rust,style=boxed,showstringspaces=false,firstnumber=1,
+]
+// RingBuffer declaration
+pub struct RingBuffer {
+    ring: Vec<u32>,
+    head: usize,
+    tail: usize,
+}
+// Methods of RingBuffer
+impl RingBuffer {
+    pub fn new(ring: Vec<u32>) -> RingBuffer {
+        // Create an empty ring buffer
+        RingBuffer { head: 0, tail: 0, ring }
+    }
+
+    pub fn is_full(&self) -> bool {
+        self.head == ((self.tail + 1) % self.ring.len())
+    }
+
+    pub fn enqueue(&mut self, val: u32) -> bool {
+        // Enqueue a new value into the ring buffer, return whether enqueue is successful.
+        if self.is_full() {
+            false // If the ring buffer is full, then returns false
+        } else {
+            self.ring[self.tail] = val; // Add the new element
+            self.tail = (self.tail + 1) % self.ring.len(); // Adjust the tail in circular array
+            true
+        }
+    }
+    pub fn dequeue(&self) { ... } // Details of dequeue are omitted
+}
+fn test_ring_buffer() { /* Unit tests (omitted). */ }
+fn main() { test_ring_buffer(); }
+\end{lstlisting}
+\caption{The Rust Implementation of Ring Buffer}
+\label{fig:ring-buffer-impl}
+\end{figure*}
+\end{comment}
+

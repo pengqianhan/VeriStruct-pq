@@ -1,0 +1,32 @@
+\section{Conclusion and Future Work}
+\label{sec:conclusion}
+
+This paper introduced \toolname{}, a novel framework that combines large language models with Verus to automatically verify Rust data-structure modules. \toolname{} systematically generates \texttt{View} implementations, type invariants, specifications, and proof code under the scheduling of an extra planner module. To mitigate the issue that LLMs do not fully grasp Verus' annotation syntax and verification-specific semantics, we not only inject syntax guidelines in the prompt, but also introduce an additional repair stage to fix errors.%
+\ifarxiv
+\ Table~\ref{tab:repair-heuristics} in the appendix details the specialized heuristics that support these repairs.
+\fi
+
+We evaluated \toolname{} on eleven benchmarks drawn from the Verus GitHub repository. Across eleven benchmark modules, \toolname{} successfully verifies ten of them and verifies 128/129 (99.2\%) of functions in our benchmark. \toolname{} shows a significant improvement over the baseline, demonstrating the framework's effectiveness.
+
+
+
+% while
+%substantially reducing the handwritten annotations required compared to
+%manual development. The resulting artifacts demonstrate that
+%LLM-guided synthesis can substantially lower the effort required to construct
+%formally verified data structures in practice.
+
+
+%By decomposing the construction of proofs into generation and repair stages, the system . Furthermore, we inject syntax guidelines in the 
+
+%This planner-guided process turns raw prover
+%errors into actionable repair steps, enabling the framework to converge on
+%verified implementations with limited human input; Table~\ref{tab:repair-heuristics}
+%details the specialized heuristics that support these repairs.
+
+
+%Looking ahead, extending the framework with richer lemma retrieval, support for
+%concurrent resource algebras, and automatic unit-test generation could further
+%increase its automation power. These enhancements would broaden the range of
+%Rust libraries amenable to verification and bring mechanically checked
+%correctness guarantees within reach for an even wider set of developers.
